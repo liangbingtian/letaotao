@@ -37,7 +37,7 @@ public class UserServiceImpl implements IUserService {
 
     public ServerResponse<String> register(User user){
 
-        ServerResponse checkvaild = this.checkValid(user.getUsername(),Const.EMAIL);
+        ServerResponse checkvaild = this.checkValid(user.getUsername(),Const.USER_NAME);
         if (!checkvaild.isSuccess())
             return checkvaild;
         checkvaild = this.checkValid(user.getEmail(),Const.EMAIL);
@@ -70,7 +70,11 @@ public class UserServiceImpl implements IUserService {
         }else {
             return ServerResponse.createByErrorMessage("参数错误");
         }
-        return ServerResponse.createBySuccessMessage("校验成功");
+        if (type.equals(Const.USER_NAME)||type.equals(Const.EMAIL)){
+            return ServerResponse.createBySuccessMessage("校验成功");
+        }else {
+            return ServerResponse.createByErrorMessage("参数错误");
+        }
     }
 
     public ServerResponse<String> selectQuestion(String username){
@@ -143,6 +147,8 @@ public class UserServiceImpl implements IUserService {
            }
            User updateUser = new User();
            updateUser.setId(user.getId());
+           updateUser.setUsername(user.getUsername());
+           updateUser.setPhone(user.getPhone());
            updateUser.setEmail(user.getEmail());
            updateUser.setQuestion(user.getQuestion());
            updateUser.setAnswer(user.getAnswer());
@@ -160,5 +166,12 @@ public class UserServiceImpl implements IUserService {
         }
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess(user);
+    }
+
+    public ServerResponse checkAdminRole(User user){
+           if (user!=null&&user.getRole().intValue() == Const.Role.ROLE_ADMIN){
+               return ServerResponse.createBySuccess();
+           }
+           return ServerResponse.createByError();
     }
 }
